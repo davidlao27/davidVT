@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Include Handsfree.js -->
+  <link rel="stylesheet" href="https://unpkg.com/handsfree@8.5.1/build/lib/assets/handsfree.css" />
+  <script src="https://unpkg.com/handsfree@8.5.1/build/lib/handsfree.js"></script>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>davidVT</title>
+    <style>
+        .body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .vtimg {
+            /* Full height */
+            position: absolute;
+            height: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+
+            /* Center and scale the image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    </style>
+</head>
+
+<body bgcolor="#0F0">
+    <img src="close.png" id="vtpic" class="vtimg"></img>
+    <script>
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        
+        const handsfree = new Handsfree({weboji: true});
+        handsfree.start();
+
+
+        navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true
+        })
+            .then(function (stream) {
+                const vtpic = document.getElementById("vtpic");
+                const velem = document.getElementById("vol");
+                const audioContext = new AudioContext();
+                const analyser = audioContext.createAnalyser();
+                const microphone = audioContext.createMediaStreamSource(stream);
+                const scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
+
+                analyser.smoothingTimeConstant = 0.8;
+                analyser.fftSize = 1024;
+
+                microphone.connect(analyser);
+                analyser.connect(scriptProcessor);
+                scriptProcessor.connect(audioContext.destination);
+                scriptProcessor.onaudioprocess = function () {
+                    const array = new Uint8Array(analyser.frequencyBinCount);
+                    analyser.getByteFrequencyData(array);
+                    const arraySum = array.reduce((a, value) => a + value, 0);
+                    const average = arraySum / array.length;
+                    let eyesc;
+
+                    let vol = Math.round(average);
+                    //console.log(vol)
+            
+                    if (handsfree.data != undefined) {
+                        eyesc = handsfree.data.weboji.state.eyesClosed;
+                    }
+
+                    if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('eyescc') && urlParams.get('eyesco') && urlParams.get('openloud')) {
+                        var opimg = urlParams.get("open");
+                        var climg = urlParams.get("close");
+                        var oplimg = urlParams.get("openloud");
+
+                        var eccimg = urlParams.get("eyescc");
+                        var ecoimg = urlParams.get("eyesco");
+
+                        if (eyesc == false) {
+                        if (vol > 0 && vol < 11) {
+                            vtpic.src = climg;
+                        } else if (vol > 11 && vol < 70) {
+                            vtpic.src = opimg;
+                        } else if (vol > 70) {
+                            vtpic.src = oplimg;
+                        }
+                    } else {
+                        if (vol > 0 && vol < 11) {
+                            vtpic.src = eccimg;
+                        } else if (vol > 11 && vol < 70) {
+                            vtpic.src = ecoimg;
+                        } else if (vol > 70) {
+                            vtpic.src = oplimg;
+                        }
+                    } 
+                    } else {
+                        if (eyesc == false) {
+                        if (vol > 0 && vol < 11) {
+                            vtpic.src = "close.png";
+                        } else if (vol > 11 && vol < 70) {
+                            vtpic.src = "open.png";
+                        } else if (vol > 70) {
+                            vtpic.src = "openloud.png";
+                        }
+                    } else {
+                        if (vol > 0 && vol < 11) {
+                            vtpic.src = "eyescc.png";
+                        } else if (vol > 11 && vol < 70) {
+                            vtpic.src = "eyesco.png";
+                        } else if (vol > 70) {
+                            vtpic.src = "openloud.png";
+                        }
+                    } 
+                    }
+                };
+            })
+            .catch(function (err) {
+                /* handle the error */
+                console.error(err);
+            });
+
+    </script>
+</body>
+
+</html>

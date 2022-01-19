@@ -16,3 +16,5 @@ URL Parameters (all images should be of the same size! (eg: 512x512px) preferrab
 **openloud** -> Open and loud volume image<br>
 **eyescc** -> Closed eyes, closed mouth image<br>
 **eyesco** -> Closed eyes, OPEN mouth image
+<br><br>
+Custom images will only be shown if all parameters are declared.
