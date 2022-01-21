@@ -119,9 +119,12 @@
     <div class="hidbtn" onclick="openMenu();">Menu</div>
     <div id="output" class="recotxt">[...]</div>
     <script>
-        var jarvismode = false; var jarviscomm = false;
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
+
+        var jarvismode = false; var jarviscomm = false; canJarvis = false;
+
+        if (urlParams.get("jmode") == "false") {canJarvis=false;}
         
         const handsfree = new Handsfree({weboji: true});
         handsfree.start();
@@ -314,6 +317,7 @@ recognition.onresult = function(event) {
     // Choose which result may be useful for you
         document.getElementById("output").innerHTML = final_transcript;
 
+    if (canJarvis) {
     if (final_transcript.includes("hey David")) {
         jarvismode = true;
     } else if (final_transcript.includes("disable subtitles")) {
@@ -328,6 +332,7 @@ recognition.onresult = function(event) {
         }
     } else if (final_transcript.includes("nevermind David") || final_transcript.includes("never mind David")) {
         jarvismode = false;
+    }
     }
 };
 
@@ -366,7 +371,7 @@ function hideMenu() {
 }
 
 function applySettingsMenu() {
-    window.location.replace("https://davidlao27.github.io/davidVT?close="+chkclose.value+"&open="+chkopen.value+"&eyescc="+chkec.value+"&eyesco="+chkeo.value+"&openloud="+chkol.value+"&smile="+chksmi.value+"&jarvisc="+chkjc.value+"&jarviso="+chkjo.value);
+    window.location.replace("https://davidlao27.github.io/davidVT?close="+chkclose.value+"&open="+chkopen.value+"&eyescc="+chkec.value+"&eyesco="+chkeo.value+"&openloud="+chkol.value+"&smile="+chksmi.value+"&jarvisc="+chkjc.value+"&jarviso="+chkjo.value+"&jmode="+jarvischk.value+"&nvol="+nvolchk.value+"&lvol="+lvolchk.value+"&subs="+subsschk.value);
 }
     </script>
 </body>
