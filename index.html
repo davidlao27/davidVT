@@ -14,7 +14,41 @@
         .body {
             margin: 0;
             overflow: hidden;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+
+        .btmnav p {
+            float: left;
+            color: #f2f2f2;
+            text-align: center;
+            padding: 10px 16px;
+            text-decoration: none;
+            font-size: 17px;
+            -webkit-filter: drop-shadow(5px 5px 2px #000);
+            filter: drop-shadow(5px 5px 2px #000);
+        }
+
+        .btmnav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+
+        .btmnav a.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .btmnav {
+            overflow-y: visible;
+            font-size: large;
+            width: 30vw;
+            height: 90vh;
+            overflow: hidden;
+            background-color: rgba(238, 238, 238, 0.8);
+            box-shadow: 0px 3px 10px 2px #000000;
+            position: absolute;
+            z-index: 1;
+            padding: 4vh;
         }
 
         .vtimg {
@@ -43,11 +77,46 @@
             background-color: rgba(0, 0, 0, 0.5);
             display: none;
         }
+
+        .hidbtn {
+            opacity: 0;
+            padding: 10px;
+            position: absolute;
+            top: 5vh;
+            left: 2vw;
+            transform: translate(-50%, -90%);
+        }
     </style>
 </head>
 
 <body bgcolor="#0F0">
     <img src="close.png" id="vtpic" class="vtimg"></img>
+    <div class="btmnav" id="btmnav" style="visibility: hidden;">
+        <button onclick="hideMenu();">Back</button><br><br>
+        || Settings ||<br><br>
+        <input type="checkbox" id="chkjarvis">Jarvis Mode</input><br>
+        <input type="checkbox" id="chksubs">Subtitles</input><br><br>
+        Language<br>
+        <input type="text" placeholder="en-EN, es-ES..." id="chklang"></input><br><br>
+
+        <div>Volume</div>
+        <input type="text" placeholder="Normal value (talking)" id="chkvoln"><br>
+        <input type="text" placeholder="Loud value (screaming)" id="chkvoll"><br>
+        <small>right now: <font id="volstr">--</font></small><br><br>
+        URLs<br>
+        <input type="text" placeholder="Open mouth" id="chkopen"><br>
+        <input type="text" placeholder="Closed mouth" id="chkclose"><br>
+        <input type="text" placeholder="Open loud mouth" id="chkol"><br>
+        <input type="text" placeholder="Smile mouth (opt)" id="chksmi"><br>
+        <input type="text" placeholder="Jarvis closed mouth" id="chkjc"><br>
+        <input type="text" placeholder="Jarvis open mouth" id="chkjo"><br>
+        <input type="text" placeholder="Eyes closed, closed mouth" id="chkec"><br>
+        <input type="text" placeholder="Eyes closed, open mouth" id="chkeo"><br>
+        <br>
+        <button onclick="applySettingsMenu();">Apply changes</button><br>
+    </div>
+    <br>
+    <div class="hidbtn" onclick="openMenu();">Menu</div>
     <div id="output" class="recotxt">[...]</div>
     <script>
         var jarvismode = false; var jarviscomm = false;
@@ -63,14 +132,25 @@
         if (joimg == null) joimg="jarviso.png";
         if (jcimg == null) jcimg="jarvisc.png";
 
+        const vtpic = document.getElementById("vtpic");
+        const velem = document.getElementById("vol");
+
+        const volstr = document.getElementById("volstr");
+
+        var opimg = urlParams.get("open");
+        var climg = urlParams.get("close");
+        var smimg = urlParams.get("smile");
+        var oplimg = urlParams.get("openloud");
+
+        var eccimg = urlParams.get("eyescc");
+        var ecoimg = urlParams.get("eyesco");
+
 
         navigator.mediaDevices.getUserMedia({
             audio: true,
             video: true
         })
             .then(function (stream) {
-                const vtpic = document.getElementById("vtpic");
-                const velem = document.getElementById("vol");
                 const audioContext = new AudioContext();
                 const analyser = audioContext.createAnalyser();
                 const microphone = audioContext.createMediaStreamSource(stream);
@@ -90,7 +170,7 @@
                     let eyesc, smil;
 
                     let vol = Math.round(average);
-                    //console.log(vol)
+                    volstr.innerHTML = vol;
             
                     if (handsfree.data != undefined) {
                         eyesc = handsfree.data.weboji.state.eyesClosed;
@@ -98,14 +178,6 @@
                     }
 
                     if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('eyescc') && urlParams.get('eyesco') && urlParams.get('openloud')) {
-                        var opimg = urlParams.get("open");
-                        var climg = urlParams.get("close");
-                        var smimg = urlParams.get("smile");
-                        var oplimg = urlParams.get("openloud");
-
-                        var eccimg = urlParams.get("eyescc");
-                        var ecoimg = urlParams.get("eyesco");
-
                         if (!smimg) smimg=climg;
 
                         console.log(joimg,jcimg)
@@ -208,18 +280,21 @@
             var recognition = new webkitSpeechRecognition();
 recognition.continuous = true;
 recognition.interimResults = true;
-recognition.lang = "en-US";
+const recolang = urlParams.get("lang");
+if (recolang == null) {
+    recognition.lang = "en-US";
+} else {
+    recognition.lang = recolang;
+}
 
 recognition.onerror = function(event) {
     console.error(event);
 };
 
 recognition.onstart = function() {
-    console.log('Speech reco started');
 };
 
 recognition.onend = function() {
-    console.log('Speech reco disconnected');
     recognition.start();
 };
 
@@ -241,15 +316,12 @@ recognition.onresult = function(event) {
 
     if (final_transcript.includes("hey David")) {
         jarvismode = true;
-    } else if (final_transcript.includes("turn off speech")) {
-        if (jarvismode)
-            document.getElementById("output").innerHTML = "ok! (reloading)";
-    } else if (final_transcript.includes("hide subtitles")) {
+    } else if (final_transcript.includes("disable subtitles")) {
         if (jarvismode) {
             document.getElementById("output").style.display = "none";
             jarvismode = false;
         }
-    } else if (final_transcript.includes("show subtitles")) {
+    } else if (final_transcript.includes("enable subtitles")) {
         if (jarvismode) {
             document.getElementById("output").style.display = "initial";
             jarvismode = false;
@@ -260,6 +332,42 @@ recognition.onresult = function(event) {
 };
 
 recognition.start();
+
+const cmenu = document.getElementById("btmnav");
+const btnmenu = document.getElementById("hidbtn");
+
+const jarvischk = document.getElementById("chkjarvis");
+const subsschk = document.getElementById("chksubs");
+
+const langchk = document.getElementById("chklang");
+
+const nvolchk = document.getElementById("chkvoln");
+const lvolchk = document.getElementById("chkvoll");
+
+const chkopen = document.getElementById("chkopen");
+const chkclose = document.getElementById("chkclose");
+const chkol = document.getElementById("chkol");
+
+const chkjc = document.getElementById("chkjc");
+const chkjo = document.getElementById("chkjo");
+
+const chkec = document.getElementById("chkec");
+const chkeo = document.getElementById("chkeo");
+const chksmi = document.getElementById("chksmi");
+
+function openMenu() {
+    cmenu.style.visibility = "visible";
+    btnmenu.style.visibility = "hidden";
+}
+
+function hideMenu() {
+    cmenu.style.visibility = "hidden";
+    btnmenu.style.visibility = "visible";
+}
+
+function applySettingsMenu() {
+    window.location.replace("https://davidlao27.github.io/davidVT?close="+chkclose.value+"&open="+chkopen.value+"&eyescc="+chkec.value+"&eyesco="+chkeo.value+"&openloud="+chkol.value+"&smile="+chksmi.value+"&jarvisc="+chkjc.value+"&jarviso="+chkjo.value);
+}
     </script>
 </body>
 

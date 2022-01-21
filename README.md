@@ -1,5 +1,7 @@
 # davidVT
 david VTubing Program
+Click over the top left, hover and you'll see your cursor change to a selecting cursor.<br>
+Click that then, and welcome to the menu!
 <br>
 <br>
 Permissions:
@@ -16,12 +18,15 @@ URL Parameters (all images should be of the same size! (eg: 512x512px) preferrab
 **openloud** -> Open and loud volume image<br>
 **eyescc** -> Closed eyes, closed mouth image<br>
 **eyesco** -> Closed eyes, OPEN mouth image
+**jarvisc** -> Jarvis closed mouth
+**jarviso** -> Jarvis open mouth
 <br><br>
 Custom images will only be shown if all parameters are declared.
 <br><br>
 If you've set custom images but your character is the default gray:<br>
 - wait a bit, stuff may be loading<br>
 - make sure the arguments are correctly typed<br><br>
+- did you specify the basics? you need open,close,eyescc,eyesco,openloud and probably jarvisc,jarvisco although untested.
 
-Arguments can be added like:<br>
+You can set arguments via the menu, but they can optionally be added like:<br>
 BASE_URL?first_arg=val1&sec_arg=val2&third_arg=val3 [...]
