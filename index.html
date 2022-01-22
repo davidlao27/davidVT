@@ -3,8 +3,8 @@
 
 <head>
     <!-- Include Handsfree.js -->
-  <link rel="stylesheet" href="https://unpkg.com/handsfree@8.5.1/build/lib/assets/handsfree.css" />
-  <script src="https://unpkg.com/handsfree@8.5.1/build/lib/handsfree.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/handsfree@8.5.1/build/lib/assets/handsfree.css" />
+    <script src="https://unpkg.com/handsfree@8.5.1/build/lib/handsfree.js"></script>
 
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -124,16 +124,16 @@
 
         var jarvismode = false; var jarviscomm = false; canJarvis = false;
 
-        if (urlParams.get("jmode") == "false") {canJarvis=false;}
-        
-        const handsfree = new Handsfree({weboji: true});
+        if (urlParams.get("jmode") == "false") { canJarvis = false; }
+
+        const handsfree = new Handsfree({ weboji: true });
         handsfree.start();
 
         var joimg = urlParams.get("jarviso");
         var jcimg = urlParams.get("jarvisc");
 
-        if (joimg == null) joimg="jarviso.png";
-        if (jcimg == null) jcimg="jarvisc.png";
+        if (joimg == null) joimg = "jarviso.png";
+        if (jcimg == null) jcimg = "jarvisc.png";
 
         const vtpic = document.getElementById("vtpic");
         const velem = document.getElementById("vol");
@@ -174,104 +174,104 @@
 
                     let vol = Math.round(average);
                     volstr.innerHTML = vol;
-            
+
                     if (handsfree.data != undefined) {
                         eyesc = handsfree.data.weboji.state.eyesClosed;
                         smil = handsfree.data.weboji.state.smile;
                     }
 
                     if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('eyescc') && urlParams.get('eyesco') && urlParams.get('openloud')) {
-                        if (!smimg) smimg=climg;
+                        if (!smimg) smimg = climg;
 
-                        console.log(joimg,jcimg)
+                        console.log(joimg, jcimg)
 
                         if (eyesc == false) {
-                        if (vol > 0 && vol < 11) {
-                            if (jarvismode) {
-                                vtpic.src = jcimg;
-                            } else if (smil == false) {
-                                vtpic.src = climg;
-                            } else {
-                                vtpic.src = smimg;
+                            if (vol > 0 && vol < 11) {
+                                if (jarvismode) {
+                                    vtpic.src = jcimg;
+                                } else if (smil == false) {
+                                    vtpic.src = climg;
+                                } else {
+                                    vtpic.src = smimg;
+                                }
+                            } else if (vol > 11 && vol < 70) {
+                                if (jarvismode) {
+                                    vtpic.src = joimg;
+                                } else {
+                                    vtpic.src = opimg;
+                                }
+                            } else if (vol > 70) {
+                                if (jarvismode) {
+                                    vtpic.src = joimg;
+                                } else {
+                                    vtpic.src = oplimg;
+                                }
                             }
-                        } else if (vol > 11 && vol < 70) {
-                            if (jarvismode) {
-                                vtpic.src = joimg;
-                            } else {
-                                vtpic.src = opimg;
-                            }
-                        } else if (vol > 70) {
-                            if (jarvismode) {
-                                vtpic.src = joimg;
-                            } else {
-                                vtpic.src = oplimg;
+                        } else {
+                            if (vol > 0 && vol < 11) {
+                                if (jarvismode) {
+                                    vtpic.src = jcimg;
+                                } else {
+                                    vtpic.src = eccimg;
+                                }
+                            } else if (vol > 11 && vol < 70) {
+                                if (jarvismode) {
+                                    vtpic.src = joimg;
+                                } else {
+                                    vtpic.src = ecoimg;
+                                }
+                            } else if (vol > 70) {
+                                if (jarvismode) {
+                                    vtpic.src = joimg;
+                                } else {
+                                    vtpic.src = oplimg;
+                                }
                             }
                         }
-                    } else {
-                        if (vol > 0 && vol < 11) {
-                            if (jarvismode) {
-                                vtpic.src = jcimg;
-                            } else {
-                                vtpic.src = eccimg;
-                            }
-                        } else if (vol > 11 && vol < 70) {
-                            if (jarvismode) {
-                                vtpic.src = joimg;
-                            } else {
-                                vtpic.src = ecoimg;
-                            }
-                        } else if (vol > 70) {
-                            if (jarvismode) {
-                                vtpic.src = joimg;
-                            } else {
-                                vtpic.src = oplimg;
-                            }
-                        }
-                    }
                     } else {
                         if (eyesc == false) {
-                        if (vol > 0 && vol < 11) {
-                            if (jarvismode) {
-                                vtpic.src = jcimg;
-                            } else if (smil == false) {
-                                vtpic.src = "close.png";
-                            } else {
-                                vtpic.src = "smile.png";
+                            if (vol > 0 && vol < 11) {
+                                if (jarvismode) {
+                                    vtpic.src = jcimg;
+                                } else if (smil == false) {
+                                    vtpic.src = "close.png";
+                                } else {
+                                    vtpic.src = "smile.png";
+                                }
+                            } else if (vol > 11 && vol < 70) {
+                                if (jarvismode) {
+                                    vtpic.src = joimg;
+                                } else {
+                                    vtpic.src = "open.png";
+                                }
+                            } else if (vol > 70) {
+                                if (jarvismode) {
+                                    vtpic.src = joimg;
+                                } else {
+                                    vtpic.src = "openloud.png";
+                                }
                             }
-                        } else if (vol > 11 && vol < 70) {
-                            if (jarvismode) {
-                                vtpic.src = joimg;
-                            } else {
-                                vtpic.src = "open.png";
-                            }
-                        } else if (vol > 70) {
-                            if (jarvismode) {
-                                vtpic.src = joimg;
-                            } else {
-                                vtpic.src = "openloud.png";
+                        } else {
+                            if (vol > 0 && vol < 11) {
+                                if (jarvismode) {
+                                    vtpic.src = joimg;
+                                } else {
+                                    vtpic.src = "eyescc.png";
+                                }
+                            } else if (vol > 11 && vol < 70) {
+                                if (jarvismode) {
+                                    vtpic.src = joimg;
+                                } else {
+                                    vtpic.src = "eyesco.png";
+                                }
+                            } else if (vol > 70) {
+                                if (jarvismode) {
+                                    vtpic.src = joimg;
+                                } else {
+                                    vtpic.src = "openloud.png";
+                                }
                             }
                         }
-                    } else {
-                        if (vol > 0 && vol < 11) {
-                            if (jarvismode) {
-                                vtpic.src = joimg;
-                            } else {
-                                vtpic.src = "eyescc.png";
-                            }
-                        } else if (vol > 11 && vol < 70) {
-                            if (jarvismode) {
-                                vtpic.src = joimg;
-                            } else {
-                                vtpic.src = "eyesco.png";
-                            }
-                        } else if (vol > 70) {
-                            if (jarvismode) {
-                                vtpic.src = joimg;
-                            } else {
-                                vtpic.src = "openloud.png";
-                            }
-                        }
-                    }
                     }
                 };
             })
@@ -280,99 +280,99 @@
                 console.error(err);
             });
 
-            var recognition = new webkitSpeechRecognition();
-recognition.continuous = true;
-recognition.interimResults = true;
-const recolang = urlParams.get("lang");
-if (recolang == null) {
-    recognition.lang = "en-US";
-} else {
-    recognition.lang = recolang;
-}
-
-recognition.onerror = function(event) {
-    console.error(event);
-};
-
-recognition.onstart = function() {
-};
-
-recognition.onend = function() {
-    recognition.start();
-};
-
-recognition.onresult = function(event) {
-    var interim_transcript = '';
-    var final_transcript = '';
-
-    for (var i = event.resultIndex; i < event.results.length; ++i) {
-        // Verify if the recognized text is the last with the isFinal property
-        if (event.results[i].isFinal) {
-            final_transcript += event.results[i][0].transcript;
+        var recognition = new webkitSpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        const recolang = urlParams.get("lang");
+        if (recolang == null) {
+            recognition.lang = "en-US";
         } else {
-            interim_transcript += event.results[i][0].transcript;
+            recognition.lang = recolang;
         }
-    }
 
-    // Choose which result may be useful for you
-        document.getElementById("output").innerHTML = final_transcript;
+        recognition.onerror = function (event) {
+            console.error(event);
+        };
 
-    if (canJarvis) {
-    if (final_transcript.includes("hey David")) {
-        jarvismode = true;
-    } else if (final_transcript.includes("disable subtitles")) {
-        if (jarvismode) {
-            document.getElementById("output").style.display = "none";
-            jarvismode = false;
+        recognition.onstart = function () {
+        };
+
+        recognition.onend = function () {
+            recognition.start();
+        };
+
+        recognition.onresult = function (event) {
+            var interim_transcript = '';
+            var final_transcript = '';
+
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+                // Verify if the recognized text is the last with the isFinal property
+                if (event.results[i].isFinal) {
+                    final_transcript += event.results[i][0].transcript;
+                } else {
+                    interim_transcript += event.results[i][0].transcript;
+                }
+            }
+
+            // Choose which result may be useful for you
+            document.getElementById("output").innerHTML = final_transcript;
+
+            if (canJarvis) {
+                if (final_transcript.includes("hey David")) {
+                    jarvismode = true;
+                } else if (final_transcript.includes("disable subtitles")) {
+                    if (jarvismode) {
+                        document.getElementById("output").style.display = "none";
+                        jarvismode = false;
+                    }
+                } else if (final_transcript.includes("enable subtitles")) {
+                    if (jarvismode) {
+                        document.getElementById("output").style.display = "initial";
+                        jarvismode = false;
+                    }
+                } else if (final_transcript.includes("nevermind David") || final_transcript.includes("never mind David")) {
+                    jarvismode = false;
+                }
+            }
+        };
+
+        recognition.start();
+
+        const cmenu = document.getElementById("btmnav");
+        const btnmenu = document.getElementById("hidbtn");
+
+        const jarvischk = document.getElementById("chkjarvis");
+        const subsschk = document.getElementById("chksubs");
+
+        const langchk = document.getElementById("chklang");
+
+        const nvolchk = document.getElementById("chkvoln");
+        const lvolchk = document.getElementById("chkvoll");
+
+        const chkopen = document.getElementById("chkopen");
+        const chkclose = document.getElementById("chkclose");
+        const chkol = document.getElementById("chkol");
+
+        const chkjc = document.getElementById("chkjc");
+        const chkjo = document.getElementById("chkjo");
+
+        const chkec = document.getElementById("chkec");
+        const chkeo = document.getElementById("chkeo");
+        const chksmi = document.getElementById("chksmi");
+
+        function openMenu() {
+            cmenu.style.visibility = "visible";
+            btnmenu.style.visibility = "hidden";
         }
-    } else if (final_transcript.includes("enable subtitles")) {
-        if (jarvismode) {
-            document.getElementById("output").style.display = "initial";
-            jarvismode = false;
+
+        function hideMenu() {
+            cmenu.style.visibility = "hidden";
+            btnmenu.style.visibility = "visible";
         }
-    } else if (final_transcript.includes("nevermind David") || final_transcript.includes("never mind David")) {
-        jarvismode = false;
-    }
-    }
-};
 
-recognition.start();
-
-const cmenu = document.getElementById("btmnav");
-const btnmenu = document.getElementById("hidbtn");
-
-const jarvischk = document.getElementById("chkjarvis");
-const subsschk = document.getElementById("chksubs");
-
-const langchk = document.getElementById("chklang");
-
-const nvolchk = document.getElementById("chkvoln");
-const lvolchk = document.getElementById("chkvoll");
-
-const chkopen = document.getElementById("chkopen");
-const chkclose = document.getElementById("chkclose");
-const chkol = document.getElementById("chkol");
-
-const chkjc = document.getElementById("chkjc");
-const chkjo = document.getElementById("chkjo");
-
-const chkec = document.getElementById("chkec");
-const chkeo = document.getElementById("chkeo");
-const chksmi = document.getElementById("chksmi");
-
-function openMenu() {
-    cmenu.style.visibility = "visible";
-    btnmenu.style.visibility = "hidden";
-}
-
-function hideMenu() {
-    cmenu.style.visibility = "hidden";
-    btnmenu.style.visibility = "visible";
-}
-
-function applySettingsMenu() {
-    window.location.replace("https://davidlao27.github.io/davidVT?close="+chkclose.value+"&open="+chkopen.value+"&eyescc="+chkec.value+"&eyesco="+chkeo.value+"&openloud="+chkol.value+"&smile="+chksmi.value+"&jarvisc="+chkjc.value+"&jarviso="+chkjo.value+"&jmode="+jarvischk.value+"&nvol="+nvolchk.value+"&lvol="+lvolchk.value+"&subs="+subsschk.value);
-}
+        function applySettingsMenu() {
+            window.location.replace("https://davidlao27.github.io/davidVT?close=" + chkclose.value + "&open=" + chkopen.value + "&eyescc=" + chkec.value + "&eyesco=" + chkeo.value + "&openloud=" + chkol.value + "&smile=" + chksmi.value + "&jarvisc=" + chkjc.value + "&jarviso=" + chkjo.value + "&jmode=" + jarvischk.checked + "&nvol=" + nvolchk.value + "&lvol=" + lvolchk.value + "&subs=" + subsschk.checked);
+        }
     </script>
 </body>
 
