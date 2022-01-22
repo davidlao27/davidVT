@@ -123,8 +123,12 @@
         const urlParams = new URLSearchParams(queryString);
 
         var jarvismode = false; var jarviscomm = false; canJarvis = true;
+        var nvol = 11; var lvol = 70;
 
         if (urlParams.get("jmode") == "false") { canJarvis = false; }
+        if (urlParams.get("subs") == "true") { document.getElementById("output").style.display = "initial"; }
+        if (urlParams.get("nvol") != null) { nvol = urlParams.get("nvol"); }
+        if (urlParams.get("lvol") != null) { lvol = urlParams.get("lvol"); }
 
         const handsfree = new Handsfree({ weboji: true });
         handsfree.start();
@@ -183,10 +187,8 @@
                     if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('eyescc') && urlParams.get('eyesco') && urlParams.get('openloud')) {
                         if (!smimg) smimg = climg;
 
-                        console.log(joimg, jcimg)
-
                         if (eyesc == false) {
-                            if (vol > 0 && vol < 11) {
+                            if (vol > 0 && vol < nvol) {
                                 if (jarvismode) {
                                     vtpic.src = jcimg;
                                 } else if (smil == false) {
@@ -194,13 +196,13 @@
                                 } else {
                                     vtpic.src = smimg;
                                 }
-                            } else if (vol > 11 && vol < 70) {
+                            } else if (vol > nvol && vol < lvol) {
                                 if (jarvismode) {
                                     vtpic.src = joimg;
                                 } else {
                                     vtpic.src = opimg;
                                 }
-                            } else if (vol > 70) {
+                            } else if (vol > lvol) {
                                 if (jarvismode) {
                                     vtpic.src = joimg;
                                 } else {
@@ -208,19 +210,19 @@
                                 }
                             }
                         } else {
-                            if (vol > 0 && vol < 11) {
+                            if (vol > 0 && vol < nvol) {
                                 if (jarvismode) {
                                     vtpic.src = jcimg;
                                 } else {
                                     vtpic.src = eccimg;
                                 }
-                            } else if (vol > 11 && vol < 70) {
+                            } else if (vol > nvol && vol < lvol) {
                                 if (jarvismode) {
                                     vtpic.src = joimg;
                                 } else {
                                     vtpic.src = ecoimg;
                                 }
-                            } else if (vol > 70) {
+                            } else if (vol > lvol) {
                                 if (jarvismode) {
                                     vtpic.src = joimg;
                                 } else {
@@ -230,7 +232,7 @@
                         }
                     } else {
                         if (eyesc == false) {
-                            if (vol > 0 && vol < 11) {
+                            if (vol > 0 && vol < nvol) {
                                 if (jarvismode) {
                                     vtpic.src = jcimg;
                                 } else if (smil == false) {
@@ -238,13 +240,13 @@
                                 } else {
                                     vtpic.src = "smile.png";
                                 }
-                            } else if (vol > 11 && vol < 70) {
+                            } else if (vol > nvol && vol < lvol) {
                                 if (jarvismode) {
                                     vtpic.src = joimg;
                                 } else {
                                     vtpic.src = "open.png";
                                 }
-                            } else if (vol > 70) {
+                            } else if (vol > lvol) {
                                 if (jarvismode) {
                                     vtpic.src = joimg;
                                 } else {
@@ -252,19 +254,19 @@
                                 }
                             }
                         } else {
-                            if (vol > 0 && vol < 11) {
+                            if (vol > 0 && vol < nvol) {
                                 if (jarvismode) {
                                     vtpic.src = joimg;
                                 } else {
                                     vtpic.src = "eyescc.png";
                                 }
-                            } else if (vol > 11 && vol < 70) {
+                            } else if (vol > nvol && vol < lvol) {
                                 if (jarvismode) {
                                     vtpic.src = joimg;
                                 } else {
                                     vtpic.src = "eyesco.png";
                                 }
-                            } else if (vol > 70) {
+                            } else if (vol > lvol) {
                                 if (jarvismode) {
                                     vtpic.src = joimg;
                                 } else {
@@ -318,19 +320,25 @@
             document.getElementById("output").innerHTML = final_transcript;
 
             if (canJarvis) {
-                if (final_transcript.includes("hey David")) {
+                if (final_transcript.includes("hey David disable subtitles") || final_transcript.includes("oye David desactiva los subtítulos") || final_transcript.includes("oye David desactivar los subtítulos")) {
+                    document.getElementById("output").style.display = "none";
+                    jarvismode = false;
+                } else if (final_transcript.includes("hey David enable subtitles") || final_transcript.includes("oye David activa los subtítulos") || final_transcript.includes("oye David activar los subtítulos")) {
+                    document.getElementById("output").style.display = "initial";
+                    jarvismode = false;
+                } else if (final_transcript.includes("hey David") || final_transcript.includes("oye David")) {
                     jarvismode = true;
-                } else if (final_transcript.includes("disable subtitles")) {
+                } else if (final_transcript.includes("disable subtitles") || final_transcript.includes("desactiva los subtítulos") ) {
                     if (jarvismode) {
                         document.getElementById("output").style.display = "none";
                         jarvismode = false;
                     }
-                } else if (final_transcript.includes("enable subtitles")) {
+                } else if (final_transcript.includes("enable subtitles") || final_transcript.includes("activa los subtítulos")) {
                     if (jarvismode) {
                         document.getElementById("output").style.display = "initial";
                         jarvismode = false;
                     }
-                } else if (final_transcript.includes("nevermind David") || final_transcript.includes("never mind David")) {
+                } else if (final_transcript.includes("nevermind David") || final_transcript.includes("never mind David") || final_transcript.includes("no importa David") || final_transcript.includes("não importa Davi")) {
                     jarvismode = false;
                 }
             }
