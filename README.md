@@ -21,6 +21,7 @@ URL Parameters (all images should be of the same size! (eg: 512x512px) preferrab
 (extra params) (can be set from menu)<br>
 **jmode** -> Jarvis enabled?<br>
 **subs** -> Subtitles enabled?<br>
+**bob** -> Does the character bob when you talk?<br>
 **bkcol** -> Background color. If not specified, will use Green.<br>
 **bkimg** -> Background image<br>
 **lang** -> Speech recognition language to use (default is en-EN)<br>

@@ -47,8 +47,13 @@
         }
 
         .btmnavtx {
+            height: 17px;
             width: 30vw;
+            color: white;
             background-color: #555;
+            border-radius: 5px;
+            resize: none;
+            box-shadow: 5px 5px 8px #222;
         }
 
         .vtimg {
@@ -66,16 +71,18 @@
         }
 
         .recotxt {
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
             position: absolute;
             text-align: center;
             top: 90%;
             left: 50%;
             transform: translate(-50%, -90%);
-            font-size: larger;
+            font-size: medium;
             color: white;
             padding: 10px;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(80, 80, 80, 0.6);
             display: none;
+            border-radius: 10px;
         }
 
         .hidbtn {
@@ -86,36 +93,92 @@
             left: 2vw;
             transform: translate(-50%, -90%);
         }
+
+        .suitchoice {
+            text-align: center;
+            position: absolute;
+            width: 50vw;
+            height: 25vh;
+            left: 25vw;
+            top: 35vh;
+            padding: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: medium;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        .suitchoice p {
+            font-size: larger;
+        }
+
+        .suitchoice div {
+            background-color: #444;
+            border-radius: 5px;
+            padding: 10px;
+            width: fit-content;
+            text-align: center;
+            display: inline;
+            box-shadow: 5px 5px 8px #111;
+        }
+
+        .genbtn {
+            background-color: #444;
+            border-radius: 5px;
+            padding: 10px;
+            width: fit-content;
+            text-align: center;
+            display: inline;
+            box-shadow: 5px 5px 8px #111;
+        }
+
+        .suitchoice textarea {
+            width: 80%;
+            box-shadow: 5px 5px 8px #333;
+        }
     </style>
 </head>
 
 <body>
     <img src="close.png" id="vtpic" class="vtimg"></img>
+
+    <div class="suitchoice" id="suitchoose" style="visibility: hidden;">
+        <p>Select an option<br><small><u onclick="window.open('https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer');">Wardrobe suits are stored per-device!</u></small></p>
+        <textarea class="btmnavtx" placeholder="Name of suit to load/override"></textarea>
+        <br><br>
+        <div onclick="loadSuit();">Load</div>
+        <div onclick="saveSuit();">Save</div>
+        <div onclick="closeWardrobe();">Cancel</div>
+    </div>
+
     <div class="btmnav" id="btmnav" style="visibility: hidden;">
-        <button onclick="hideMenu();">Back</button><br><br>
-        <b>|| Settings ||</b><br>
+        <b style="font-size: x-large">Settings</b><br>
         <small>see placeholders for info!</small>
         <br><br>
         <input type="checkbox" id="chkjarvis">Jarvis Mode<br>
-        <input type="checkbox" id="chksubs">Subtitles<br><br>
+        <input type="checkbox" id="chksubs">Subtitles<br>
+        <input type="checkbox" id="chkbobot">Bob-on-talk<br><br>
         Language<br>
-        <input class="btmnavtx" type="text" placeholder="en-EN, es-ES..." id="chklang"><br><br>
+        <textarea class="btmnavtx" placeholder="en-EN, es-ES..." id="chklang"></textarea><br><br>
 
         <div>Volume</div>
-        <input class="btmnavtx" type="text" placeholder="Normal value (talking)" id="chkvoln"><br>
-        <input class="btmnavtx" type="text" placeholder="Loud value (screaming)" id="chkvoll"><br>
+        <textarea class="btmnavtx" placeholder="Normal value (talking)" id="chkvoln"></textarea><br>
+        <textarea class="btmnavtx" placeholder="Loud value (screaming)" id="chkvoll"></textarea><br>
         <small>right now: <font id="volstr">--</font></small><br><br>
         URLs<br>
-        <input class="btmnavtx" type="text" placeholder="Open mouth" id="chkopen"><br>
-        <input class="btmnavtx" type="text" placeholder="Closed mouth" id="chkclose"><br>
-        <input class="btmnavtx" type="text" placeholder="Open loud mouth" id="chkol"><br>
-        <input class="btmnavtx" type="text" placeholder="Jarvis closed mouth" id="chkjc"><br>
-        <input class="btmnavtx" type="text" placeholder="Jarvis open mouth" id="chkjo"><br><br>
+        <textarea class="btmnavtx" placeholder="Open mouth" id="chkopen"></textarea><br>
+        <textarea class="btmnavtx" placeholder="Closed mouth" id="chkclose"></textarea><br>
+        <textarea class="btmnavtx" placeholder="Open loud mouth" id="chkol"></textarea><br>
+        <textarea class="btmnavtx" placeholder="Jarvis closed mouth" id="chkjc"></textarea><br>
+        <textarea class="btmnavtx" placeholder="Jarvis open mouth" id="chkjo"></textarea><br><br>
         Others<br>
-        <input class="btmnavtx" type="text" placeholder="BG Color: 0F0/00FF00 = greenscreen" id="chkbkc"><br>
-        <input class="btmnavtx" type="text" placeholder="BG Image (url)" id="chkbki"><br>
+        <textarea class="btmnavtx" placeholder="BG Color: 0F0/00FF00 = greenscreen" id="chkbkc"></textarea><br>
+        <textarea class="btmnavtx" placeholder="BG Image (url)" id="chkbki"></textarea><br>
         <br>
-        <button onclick="applySettingsMenu();">Apply changes</button><br>
+
+        <div class="genbtn" onclick="hideMenu();">Exit</div>
+        <div class="genbtn" onclick="applySettingsMenu();">Apply</div>
     </div>
     <br>
     <div class="hidbtn" onclick="openMenu();">Menu</div>
@@ -124,7 +187,9 @@
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
 
-        var jarvismode = false; var jarviscomm = false; canJarvis = true; let vol;
+        var jarvismode = false; var jarviscomm = false; let vol;
+        let canJarvis = true;
+        let canBob = false;
         var nvol = 11; var lvol = 70;
 
         if (urlParams.get("jmode") == "false") { canJarvis = false; }
@@ -133,6 +198,7 @@
         if (urlParams.get("lvol") != null) { lvol = urlParams.get("lvol"); }
         if (urlParams.get("bkcol") != null) { document.body.style.backgroundColor = "#" + urlParams.get("bkcol"); } else { document.body.style.backgroundColor = "#0F0"; }
         if (urlParams.get("bkimg") != null) { document.body.style.backgroundImage = "url('" + urlParams.get("bkimg") + "')"; }
+        if (urlParams.get("bob") != null) { if (urlParams.get("bob") == "true") { canBob = true; } }
 
         var joimg = urlParams.get("jarviso");
         var jcimg = urlParams.get("jarvisc");
@@ -184,18 +250,21 @@
 
             if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud')) {
                 if (vol > 0 && vol < nvol) {
+                    if (canBob) { vtpic.style.top = "50%" }
                     if (jarvismode) {
                         if (vtpic.src != jcimg) vtpic.src = jcimg;
                     } else {
                         if (vtpic.src != climg) vtpic.src = climg;
                     }
                 } else if (vol > nvol && vol < lvol) {
+                    if (canBob) { vtpic.style.top = "48%" }
                     if (jarvismode) {
                         if (vtpic.src != joimg) vtpic.src = joimg;
                     } else {
                         if (vtpic.src != joimg) vtpic.src = opimg;
                     }
                 } else if (vol > lvol) {
+                    if (canBob) { vtpic.style.top = "48%" }
                     if (jarvismode) {
                         if (vtpic.src != joimg) vtpic.src = joimg;
                     } else {
@@ -204,18 +273,21 @@
                 }
             } else {
                 if (vol > 0 && vol < nvol) {
+                    if (canBob) { vtpic.style.top = "50%" }
                     if (jarvismode) {
                         if (vtpic.src != jcimg) vtpic.src = jcimg;
                     } else {
                         if (vtpic.src != "close.png") vtpic.src = "close.png";
                     }
                 } else if (vol > nvol && vol < lvol) {
+                    if (canBob) { vtpic.style.top = "48%" }
                     if (jarvismode) {
                         if (vtpic.src != joimg) vtpic.src = joimg;
                     } else {
                         if (vtpic.src != "open.png") vtpic.src = "open.png";
                     }
                 } else if (vol > lvol) {
+                    if (canBob) { vtpic.style.top = "48%" }
                     if (jarvismode) {
                         if (vtpic.src != joimg) vtpic.src = joimg;
                     } else {
@@ -224,6 +296,28 @@
                 }
             }
         }, 32);
+
+        function setCookie(cname, cvalue, exdays) {
+            const d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            let expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+
+        function getCookie(cname) {
+            let name = cname + "=";
+            let ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
 
         var recognition = new webkitSpeechRecognition();
         recognition.continuous = true;
@@ -269,6 +363,9 @@
                 } else if (final_transcript.includes("hey David enable subtitles") || final_transcript.includes("oye David activa los subtítulos") || final_transcript.includes("oye David activar los subtítulos")) {
                     document.getElementById("output").style.display = "initial";
                     jarvismode = false;
+                } else if (final_transcript.includes("hey David open wardrobe") || final_transcript.includes("hey David open the wardrobe") || final_transcript.includes("oye David abre el armario")) {
+                    jarvismode = false;
+                    openWardrobe();
                 } else if (final_transcript.includes("hey David") || final_transcript.includes("oye David")) {
                     jarvismode = true;
                 } else if (final_transcript.includes("disable subtitles") || final_transcript.includes("desactiva los subtítulos")) {
@@ -280,6 +377,10 @@
                     if (jarvismode) {
                         document.getElementById("output").style.display = "initial";
                         jarvismode = false;
+                    }
+                } else if (final_transcript.includes("open wardrobe") || final_transcript.includes("open the wardrobe") || final_transcript.includes("abre el armario")) {
+                    if (jarvismode) {
+                        jarvismode = false; openWardrobe();
                     }
                 } else if (final_transcript.includes("nevermind David") || final_transcript.includes("never mind David") || final_transcript.includes("no importa David") || final_transcript.includes("não importa Davi")) {
                     jarvismode = false;
@@ -294,6 +395,7 @@
 
         const jarvischk = document.getElementById("chkjarvis");
         const subsschk = document.getElementById("chksubs");
+        const bobotchk = document.getElementById("chkbobot");
 
         const langchk = document.getElementById("chklang");
 
@@ -321,7 +423,23 @@
         }
 
         function applySettingsMenu() {
-            window.location.replace("https://davidlao27.github.io/davidVT?close=" + chkclose.value + "&open=" + chkopen.value + "&openloud=" + chkol.value + "&jarvisc=" + chkjc.value + "&jarviso=" + chkjo.value + "&jmode=" + jarvischk.checked + "&nvol=" + nvolchk.value + "&lvol=" + lvolchk.value + "&subs=" + subsschk.checked + "&bkcol=" + bkcolchk.value + "&bkimg=" + bkimgchk.value);
+            window.location.replace("https://davidlao27.github.io/davidVT?close=" + chkclose.value + "&open=" + chkopen.value + "&openloud=" + chkol.value + "&jarvisc=" + chkjc.value + "&jarviso=" + chkjo.value + "&jmode=" + jarvischk.checked + "&nvol=" + nvolchk.value + "&lvol=" + lvolchk.value + "&subs=" + subsschk.checked + "&bkcol=" + bkcolchk.value + "&bkimg=" + bkimgchk.value + "&bob=" + bobotchk.checked);
+        }
+
+        function openWardrobe() {
+            document.getElementById("suitchoose").style.visibility = "visible";
+        }
+
+        function closeWardrobe() {
+            document.getElementById("suitchoose").style.visibility = "hidden";
+        }
+
+        function loadSuit() {
+            alert("Not done yet!");
+        }
+
+        function saveSuit() {
+            alert("Not done yet!");
         }
     </script>
 </body>
