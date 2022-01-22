@@ -2,10 +2,6 @@
 <html lang="en">
 
 <head>
-    <!-- Include Handsfree.js -->
-    <link rel="stylesheet" href="https://unpkg.com/handsfree@8.5.1/build/lib/assets/handsfree.css" />
-    <script src="https://unpkg.com/handsfree@8.5.1/build/lib/handsfree.js"></script>
-
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,42 +9,46 @@
     <style>
         .body {
             margin: 0;
+            background-color: #00FF00;
             overflow: hidden;
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
+
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
         }
 
-        .btmnav p {
-            float: left;
-            color: #f2f2f2;
-            text-align: center;
-            padding: 10px 16px;
-            text-decoration: none;
-            font-size: 17px;
-            -webkit-filter: drop-shadow(5px 5px 2px #000);
-            filter: drop-shadow(5px 5px 2px #000);
+        ::placeholder {
+            color: #AAA;
+            opacity: 1;
+            /* Firefox */
         }
 
-        .btmnav a:hover {
-            background-color: #ddd;
-            color: black;
+        :-ms-input-placeholder {
+            /* Internet Explorer 10-11 */
+            color: #AAA;
         }
 
-        .btmnav a.active {
-            background-color: #4CAF50;
-            color: white;
+        ::-ms-input-placeholder {
+            /* Microsoft Edge */
+            color: #AAA;
         }
 
         .btmnav {
-            overflow-y: visible;
-            font-size: large;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: medium;
             width: 30vw;
             height: 90vh;
-            overflow: hidden;
-            background-color: rgba(238, 238, 238, 0.8);
+            color: white;
+            background-color: rgba(44, 44, 44, 0.8);
             box-shadow: 0px 3px 10px 2px #000000;
             position: absolute;
             z-index: 1;
             padding: 4vh;
+        }
+
+        .btmnavtx {
+            width: 30vw;
+            background-color: #555;
         }
 
         .vtimg {
@@ -89,29 +89,31 @@
     </style>
 </head>
 
-<body bgcolor="#0F0">
+<body>
     <img src="close.png" id="vtpic" class="vtimg"></img>
     <div class="btmnav" id="btmnav" style="visibility: hidden;">
         <button onclick="hideMenu();">Back</button><br><br>
-        || Settings ||<br><br>
-        <input type="checkbox" id="chkjarvis">Jarvis Mode</input><br>
-        <input type="checkbox" id="chksubs">Subtitles</input><br><br>
+        <b>|| Settings ||</b><br>
+        <small>see placeholders for info!</small>
+        <br><br>
+        <input type="checkbox" id="chkjarvis">Jarvis Mode<br>
+        <input type="checkbox" id="chksubs">Subtitles<br><br>
         Language<br>
-        <input type="text" placeholder="en-EN, es-ES..." id="chklang"></input><br><br>
+        <input class="btmnavtx" type="text" placeholder="en-EN, es-ES..." id="chklang"><br><br>
 
         <div>Volume</div>
-        <input type="text" placeholder="Normal value (talking)" id="chkvoln"><br>
-        <input type="text" placeholder="Loud value (screaming)" id="chkvoll"><br>
+        <input class="btmnavtx" type="text" placeholder="Normal value (talking)" id="chkvoln"><br>
+        <input class="btmnavtx" type="text" placeholder="Loud value (screaming)" id="chkvoll"><br>
         <small>right now: <font id="volstr">--</font></small><br><br>
         URLs<br>
-        <input type="text" placeholder="Open mouth" id="chkopen"><br>
-        <input type="text" placeholder="Closed mouth" id="chkclose"><br>
-        <input type="text" placeholder="Open loud mouth" id="chkol"><br>
-        <input type="text" placeholder="Smile mouth (opt)" id="chksmi"><br>
-        <input type="text" placeholder="Jarvis closed mouth" id="chkjc"><br>
-        <input type="text" placeholder="Jarvis open mouth" id="chkjo"><br>
-        <input type="text" placeholder="Eyes closed, closed mouth" id="chkec"><br>
-        <input type="text" placeholder="Eyes closed, open mouth" id="chkeo"><br>
+        <input class="btmnavtx" type="text" placeholder="Open mouth" id="chkopen"><br>
+        <input class="btmnavtx" type="text" placeholder="Closed mouth" id="chkclose"><br>
+        <input class="btmnavtx" type="text" placeholder="Open loud mouth" id="chkol"><br>
+        <input class="btmnavtx" type="text" placeholder="Jarvis closed mouth" id="chkjc"><br>
+        <input class="btmnavtx" type="text" placeholder="Jarvis open mouth" id="chkjo"><br><br>
+        Others<br>
+        <input class="btmnavtx" type="text" placeholder="BG Color: 0F0/00FF00 = greenscreen" id="chkbkc"><br>
+        <input class="btmnavtx" type="text" placeholder="BG Image (url)" id="chkbki"><br>
         <br>
         <button onclick="applySettingsMenu();">Apply changes</button><br>
     </div>
@@ -122,16 +124,15 @@
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
 
-        var jarvismode = false; var jarviscomm = false; canJarvis = true;
+        var jarvismode = false; var jarviscomm = false; canJarvis = true; let vol;
         var nvol = 11; var lvol = 70;
 
         if (urlParams.get("jmode") == "false") { canJarvis = false; }
         if (urlParams.get("subs") == "true") { document.getElementById("output").style.display = "initial"; }
         if (urlParams.get("nvol") != null) { nvol = urlParams.get("nvol"); }
         if (urlParams.get("lvol") != null) { lvol = urlParams.get("lvol"); }
-
-        const handsfree = new Handsfree({ weboji: true });
-        handsfree.start();
+        if (urlParams.get("bkcol") != null) { document.body.style.backgroundColor = "#" + urlParams.get("bkcol"); } else { document.body.style.backgroundColor = "#0F0"; }
+        if (urlParams.get("bkimg") != null) { document.body.style.backgroundImage = "url('" + urlParams.get("bkimg") + "')"; }
 
         var joimg = urlParams.get("jarviso");
         var jcimg = urlParams.get("jarvisc");
@@ -146,16 +147,11 @@
 
         var opimg = urlParams.get("open");
         var climg = urlParams.get("close");
-        var smimg = urlParams.get("smile");
         var oplimg = urlParams.get("openloud");
-
-        var eccimg = urlParams.get("eyescc");
-        var ecoimg = urlParams.get("eyesco");
 
 
         navigator.mediaDevices.getUserMedia({
-            audio: true,
-            video: true
+            audio: true
         })
             .then(function (stream) {
                 const audioContext = new AudioContext();
@@ -174,113 +170,60 @@
                     analyser.getByteFrequencyData(array);
                     const arraySum = array.reduce((a, value) => a + value, 0);
                     const average = arraySum / array.length;
-                    let eyesc, smil;
 
-                    let vol = Math.round(average);
-                    volstr.innerHTML = vol;
-
-                    if (handsfree.data != undefined) {
-                        eyesc = handsfree.data.weboji.state.eyesClosed;
-                        smil = handsfree.data.weboji.state.smile;
-                    }
-
-                    if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('eyescc') && urlParams.get('eyesco') && urlParams.get('openloud')) {
-                        if (!smimg) smimg = climg;
-
-                        if (eyesc == false) {
-                            if (vol > 0 && vol < nvol) {
-                                if (jarvismode) {
-                                    vtpic.src = jcimg;
-                                } else if (smil == false) {
-                                    vtpic.src = climg;
-                                } else {
-                                    vtpic.src = smimg;
-                                }
-                            } else if (vol > nvol && vol < lvol) {
-                                if (jarvismode) {
-                                    vtpic.src = joimg;
-                                } else {
-                                    vtpic.src = opimg;
-                                }
-                            } else if (vol > lvol) {
-                                if (jarvismode) {
-                                    vtpic.src = joimg;
-                                } else {
-                                    vtpic.src = oplimg;
-                                }
-                            }
-                        } else {
-                            if (vol > 0 && vol < nvol) {
-                                if (jarvismode) {
-                                    vtpic.src = jcimg;
-                                } else {
-                                    vtpic.src = eccimg;
-                                }
-                            } else if (vol > nvol && vol < lvol) {
-                                if (jarvismode) {
-                                    vtpic.src = joimg;
-                                } else {
-                                    vtpic.src = ecoimg;
-                                }
-                            } else if (vol > lvol) {
-                                if (jarvismode) {
-                                    vtpic.src = joimg;
-                                } else {
-                                    vtpic.src = oplimg;
-                                }
-                            }
-                        }
-                    } else {
-                        if (eyesc == false) {
-                            if (vol > 0 && vol < nvol) {
-                                if (jarvismode) {
-                                    vtpic.src = jcimg;
-                                } else if (smil == false) {
-                                    vtpic.src = "close.png";
-                                } else {
-                                    vtpic.src = "smile.png";
-                                }
-                            } else if (vol > nvol && vol < lvol) {
-                                if (jarvismode) {
-                                    vtpic.src = joimg;
-                                } else {
-                                    vtpic.src = "open.png";
-                                }
-                            } else if (vol > lvol) {
-                                if (jarvismode) {
-                                    vtpic.src = joimg;
-                                } else {
-                                    vtpic.src = "openloud.png";
-                                }
-                            }
-                        } else {
-                            if (vol > 0 && vol < nvol) {
-                                if (jarvismode) {
-                                    vtpic.src = joimg;
-                                } else {
-                                    vtpic.src = "eyescc.png";
-                                }
-                            } else if (vol > nvol && vol < lvol) {
-                                if (jarvismode) {
-                                    vtpic.src = joimg;
-                                } else {
-                                    vtpic.src = "eyesco.png";
-                                }
-                            } else if (vol > lvol) {
-                                if (jarvismode) {
-                                    vtpic.src = joimg;
-                                } else {
-                                    vtpic.src = "openloud.png";
-                                }
-                            }
-                        }
-                    }
+                    vol = Math.round(average);
                 };
             })
             .catch(function (err) {
                 /* handle the error */
                 console.error(err);
             });
+
+        setInterval(() => {
+            volstr.innerHTML = vol;
+
+            if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud')) {
+                if (vol > 0 && vol < nvol) {
+                    if (jarvismode) {
+                        if (vtpic.src != jcimg) vtpic.src = jcimg;
+                    } else {
+                        if (vtpic.src != climg) vtpic.src = climg;
+                    }
+                } else if (vol > nvol && vol < lvol) {
+                    if (jarvismode) {
+                        if (vtpic.src != joimg) vtpic.src = joimg;
+                    } else {
+                        if (vtpic.src != joimg) vtpic.src = opimg;
+                    }
+                } else if (vol > lvol) {
+                    if (jarvismode) {
+                        if (vtpic.src != joimg) vtpic.src = joimg;
+                    } else {
+                        if (vtpic.src != oplimg) vtpic.src = oplimg;
+                    }
+                }
+            } else {
+                if (vol > 0 && vol < nvol) {
+                    if (jarvismode) {
+                        if (vtpic.src != jcimg) vtpic.src = jcimg;
+                    } else {
+                        if (vtpic.src != "close.png") vtpic.src = "close.png";
+                    }
+                } else if (vol > nvol && vol < lvol) {
+                    if (jarvismode) {
+                        if (vtpic.src != joimg) vtpic.src = joimg;
+                    } else {
+                        if (vtpic.src != "open.png") vtpic.src = "open.png";
+                    }
+                } else if (vol > lvol) {
+                    if (jarvismode) {
+                        if (vtpic.src != joimg) vtpic.src = joimg;
+                    } else {
+                        if (vtpic.src != "openloud.png") vtpic.src = "openloud.png";
+                    }
+                }
+            }
+        }, 32);
 
         var recognition = new webkitSpeechRecognition();
         recognition.continuous = true;
@@ -328,7 +271,7 @@
                     jarvismode = false;
                 } else if (final_transcript.includes("hey David") || final_transcript.includes("oye David")) {
                     jarvismode = true;
-                } else if (final_transcript.includes("disable subtitles") || final_transcript.includes("desactiva los subtítulos") ) {
+                } else if (final_transcript.includes("disable subtitles") || final_transcript.includes("desactiva los subtítulos")) {
                     if (jarvismode) {
                         document.getElementById("output").style.display = "none";
                         jarvismode = false;
@@ -364,9 +307,8 @@
         const chkjc = document.getElementById("chkjc");
         const chkjo = document.getElementById("chkjo");
 
-        const chkec = document.getElementById("chkec");
-        const chkeo = document.getElementById("chkeo");
-        const chksmi = document.getElementById("chksmi");
+        const bkcolchk = document.getElementById("chkbkc");
+        const bkimgchk = document.getElementById("chkbki");
 
         function openMenu() {
             cmenu.style.visibility = "visible";
@@ -379,7 +321,7 @@
         }
 
         function applySettingsMenu() {
-            window.location.replace("https://davidlao27.github.io/davidVT?close=" + chkclose.value + "&open=" + chkopen.value + "&eyescc=" + chkec.value + "&eyesco=" + chkeo.value + "&openloud=" + chkol.value + "&smile=" + chksmi.value + "&jarvisc=" + chkjc.value + "&jarviso=" + chkjo.value + "&jmode=" + jarvischk.checked + "&nvol=" + nvolchk.value + "&lvol=" + lvolchk.value + "&subs=" + subsschk.checked);
+            window.location.replace("https://davidlao27.github.io/davidVT?close=" + chkclose.value + "&open=" + chkopen.value + "&openloud=" + chkol.value + "&jarvisc=" + chkjc.value + "&jarviso=" + chkjo.value + "&jmode=" + jarvischk.checked + "&nvol=" + nvolchk.value + "&lvol=" + lvolchk.value + "&subs=" + subsschk.checked + "&bkcol=" + bkcolchk.value + "&bkimg=" + bkimgchk.value);
         }
     </script>
 </body>
