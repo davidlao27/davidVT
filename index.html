@@ -36,7 +36,7 @@
         .btmnav {
             font-family: Arial, Helvetica, sans-serif;
             font-size: medium;
-            width: 30vw;
+            width: 45vw;
             height: 90vh;
             color: white;
             background-color: rgba(44, 44, 44, 0.8);
@@ -98,6 +98,21 @@
             text-align: center;
             position: absolute;
             width: 50vw;
+            height: 35vh;
+            left: 25vw;
+            top: 35vh;
+            padding: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: medium;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+
+        .suitokcho {
+            text-align: center;
+            position: absolute;
+            width: 50vw;
             height: 25vh;
             left: 25vw;
             top: 35vh;
@@ -114,6 +129,20 @@
         }
 
         .suitchoice div {
+            background-color: #444;
+            border-radius: 5px;
+            padding: 10px;
+            width: fit-content;
+            text-align: center;
+            display: inline;
+            box-shadow: 5px 5px 8px #111;
+        }
+
+        .suitokcho p {
+            font-size: larger;
+        }
+
+        .suitokcho div {
             background-color: #444;
             border-radius: 5px;
             padding: 10px;
@@ -144,12 +173,41 @@
     <img src="close.png" id="vtpic" class="vtimg"></img>
 
     <div class="suitchoice" id="suitchoose" style="visibility: hidden;">
-        <p>Select an option<br><small><u onclick="window.open('https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer');">Wardrobe suits are stored per-device!</u></small></p>
-        <textarea class="btmnavtx" placeholder="Name of suit to load/override"></textarea>
+        <p>Select an option<br><small><u
+                    onclick="window.open('https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer');">Wardrobe
+                    suits are stored per-device!</u></small></p>
+        <textarea class="btmnavtx" id="wrsname" placeholder="Name of suit to load/override"></textarea>
         <br><br>
         <div onclick="loadSuit();">Load</div>
         <div onclick="saveSuit();">Save</div>
+        <div onclick="unwearSuit();">Unwear</div>
+        <br><br><br>
+        <div onclick="clearSuit();">Delete</div>
         <div onclick="closeWardrobe();">Cancel</div>
+    </div>
+
+    <div class="suitokcho" id="suitok" style="visibility: hidden;">
+        <p>Saved!<br><small><i>Wardrobe suits are only saved for 1 year. It is recommended to use URLs
+                    instead.</i></small></p>
+        <div onclick="closeAftWardrobe();">Cancel</div>
+    </div>
+
+    <div class="suitokcho" id="suitloaded" style="visibility: hidden;">
+        <p>Loaded!<br><small><i>Wardrobe suits are only saved for 1 year. It is recommended to use URLs
+                    instead.</i></small></p>
+        <div onclick="closeAft2Wardrobe();">Cancel</div>
+    </div>
+
+    <div class="suitokcho" id="suitcleared" style="visibility: hidden;">
+        <p>Cleared!<br><small><i>Wardrobe suits are only saved for 1 year. It is recommended to use URLs
+                    instead.</i></small></p>
+        <div onclick="closeAft3Wardrobe();">Cancel</div>
+    </div>
+
+    <div class="suitokcho" id="suitunworn" style="visibility: hidden;">
+        <p>Unworn!<br><small><i>Wardrobe suits are only saved for 1 year. It is recommended to use URLs
+                    instead.</i></small></p>
+        <div onclick="closeAft4Wardrobe();">Cancel</div>
     </div>
 
     <div class="btmnav" id="btmnav" style="visibility: hidden;">
@@ -179,6 +237,7 @@
 
         <div class="genbtn" onclick="hideMenu();">Exit</div>
         <div class="genbtn" onclick="applySettingsMenu();">Apply</div>
+        <div class="genbtn" onclick="openMenuWardrobe();">Wardrobe</div>
     </div>
     <br>
     <div class="hidbtn" onclick="openMenu();">Menu</div>
@@ -188,17 +247,24 @@
         const urlParams = new URLSearchParams(queryString);
 
         var jarvismode = false; var jarviscomm = false; let vol;
-        let canJarvis = true;
+        let canJarvis = false;
         let canBob = false;
         var nvol = 11; var lvol = 70;
 
-        if (urlParams.get("jmode") == "false") { canJarvis = false; }
+        if (urlParams.get("jmode") == "true") { canJarvis = true; }
         if (urlParams.get("subs") == "true") { document.getElementById("output").style.display = "initial"; }
         if (urlParams.get("nvol") != null) { nvol = urlParams.get("nvol"); }
         if (urlParams.get("lvol") != null) { lvol = urlParams.get("lvol"); }
         if (urlParams.get("bkcol") != null) { document.body.style.backgroundColor = "#" + urlParams.get("bkcol"); } else { document.body.style.backgroundColor = "#0F0"; }
         if (urlParams.get("bkimg") != null) { document.body.style.backgroundImage = "url('" + urlParams.get("bkimg") + "')"; }
         if (urlParams.get("bob") != null) { if (urlParams.get("bob") == "true") { canBob = true; } }
+
+        var nsopen = "open.png";
+        var nsclose = "close.png";
+        var nsopenloud = "openloud.png";
+
+        var nsjc = "jarvisc.png";
+        var nsjo = "jarviso.png";
 
         var joimg = urlParams.get("jarviso");
         var jcimg = urlParams.get("jarvisc");
@@ -211,9 +277,80 @@
 
         const volstr = document.getElementById("volstr");
 
+        //Cookies//
+        function setCookie(cname, cvalue, exdays) {
+            const d = new Date();
+            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+            let expires = "expires=" + d.toUTCString();
+            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+        }
+
+        function getCookie(cname) {
+            let name = cname + "=";
+            let ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+        //Cookies//
+
         var opimg = urlParams.get("open");
         var climg = urlParams.get("close");
         var oplimg = urlParams.get("openloud");
+
+        if (getCookie("loadedsuit") != '') {
+            var suit = getCookie(getCookie("loadedsuit"));
+            var ssuit = suit.split(",");
+
+            climg = ssuit[0]; nsclose = ssuit[0];
+            opimg = ssuit[1]; nsopen = ssuit[1];
+            oplimg = ssuit[2]; nsopenloud = ssuit[2];
+
+            jcimg = ssuit[3]; nsjc = ssuit[3];
+            joimg = ssuit[4]; nsjo = ssuit[4];
+        }
+
+        document.getElementById("chkjarvis").checked = urlParams.get("jmode");
+        document.getElementById("chksubs").checked = urlParams.get("subs");
+        document.getElementById("chkbobot").checked = urlParams.get("bob");
+
+        if (urlParams.get("lang") != null) document.getElementById("chklang").value = urlParams.get("lang")
+        else document.getElementById("chklang").value = "en-EN";
+
+        if (urlParams.get("nvol") != null) document.getElementById("chkvoll").value = urlParams.get("nvol")
+        else document.getElementById("chkvoln").value = "11";
+
+        if (urlParams.get("lvol") != null) document.getElementById("chkvoln").value = urlParams.get("lvol")
+        else document.getElementById("chkvoll").value = "70";
+
+
+        if (urlParams.get("open") != null) document.getElementById("chkopen").value = urlParams.get("open")
+        else document.getElementById("chkopen").value = "open.png";
+
+        if (urlParams.get("close") != null) document.getElementById("chkclose").value = urlParams.get("close")
+        else document.getElementById("chkclose").value = "close.png";
+
+        if (urlParams.get("openloud") != null) document.getElementById("chkol").value = urlParams.get("openloud")
+        else document.getElementById("chkol").value = "openloud.png";
+
+        if (urlParams.get("jarvisc") != null) document.getElementById("chkjc").value = urlParams.get("jarvisc")
+        else document.getElementById("chkjc").value = "jarvisc.png";
+
+        if (urlParams.get("jarviso") != null) document.getElementById("chkjo").value = urlParams.get("jarviso")
+        else document.getElementById("chkjo").value = "jarviso.png";
+
+        if (urlParams.get("bkcol") != null) document.getElementById("chkbkc").value = urlParams.get("bkcol")
+        else document.getElementById("chkbkc").value = "0F0";
+
+        if (urlParams.get("bkimg") != null) document.getElementById("chkbki").value = urlParams.get("bkimg")
+        else document.getElementById("chkbki").value = "";
 
 
         navigator.mediaDevices.getUserMedia({
@@ -248,7 +385,7 @@
         setInterval(() => {
             volstr.innerHTML = vol;
 
-            if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud')) {
+            if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('jarvisc') && urlParams.get('jarviso')) {
                 if (vol > 0 && vol < nvol) {
                     if (canBob) { vtpic.style.top = "50%" }
                     if (jarvismode) {
@@ -277,47 +414,25 @@
                     if (jarvismode) {
                         if (vtpic.src != jcimg) vtpic.src = jcimg;
                     } else {
-                        if (vtpic.src != "close.png") vtpic.src = "close.png";
+                        if (vtpic.src != nsclose) vtpic.src = nsclose;
                     }
                 } else if (vol > nvol && vol < lvol) {
                     if (canBob) { vtpic.style.top = "48%" }
                     if (jarvismode) {
                         if (vtpic.src != joimg) vtpic.src = joimg;
                     } else {
-                        if (vtpic.src != "open.png") vtpic.src = "open.png";
+                        if (vtpic.src != nsopen) vtpic.src = nsopen;
                     }
                 } else if (vol > lvol) {
                     if (canBob) { vtpic.style.top = "48%" }
                     if (jarvismode) {
                         if (vtpic.src != joimg) vtpic.src = joimg;
                     } else {
-                        if (vtpic.src != "openloud.png") vtpic.src = "openloud.png";
+                        if (vtpic.src != nsopenloud) vtpic.src = nsopenloud;
                     }
                 }
             }
         }, 32);
-
-        function setCookie(cname, cvalue, exdays) {
-            const d = new Date();
-            d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-            let expires = "expires=" + d.toUTCString();
-            document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-        }
-
-        function getCookie(cname) {
-            let name = cname + "=";
-            let ca = document.cookie.split(';');
-            for (let i = 0; i < ca.length; i++) {
-                let c = ca[i];
-                while (c.charAt(0) == ' ') {
-                    c = c.substring(1);
-                }
-                if (c.indexOf(name) == 0) {
-                    return c.substring(name.length, c.length);
-                }
-            }
-            return "";
-        }
 
         var recognition = new webkitSpeechRecognition();
         recognition.continuous = true;
@@ -392,6 +507,10 @@
 
         const cmenu = document.getElementById("btmnav");
         const btnmenu = document.getElementById("hidbtn");
+        const suitokmenu = document.getElementById("suitok");
+        const suitloadedmenu = document.getElementById("suitloaded");
+        const suitclearedmenu = document.getElementById("suitcleared");
+        const suitunwornmenu = document.getElementById("suitunworn");
 
         const jarvischk = document.getElementById("chkjarvis");
         const subsschk = document.getElementById("chksubs");
@@ -414,12 +533,10 @@
 
         function openMenu() {
             cmenu.style.visibility = "visible";
-            btnmenu.style.visibility = "hidden";
         }
 
         function hideMenu() {
             cmenu.style.visibility = "hidden";
-            btnmenu.style.visibility = "visible";
         }
 
         function applySettingsMenu() {
@@ -430,16 +547,137 @@
             document.getElementById("suitchoose").style.visibility = "visible";
         }
 
+        function openMenuWardrobe() {
+            cmenu.style.visibility = "hidden";
+            document.getElementById("suitchoose").style.visibility = "visible";
+        }
+
         function closeWardrobe() {
             document.getElementById("suitchoose").style.visibility = "hidden";
         }
 
+        function closeAftWardrobe() {
+            suitokmenu.style.visibility = "hidden";
+        }
+
+        function closeAft2Wardrobe() {
+            suitloadedmenu.style.visibility = "hidden";
+        }
+
+        function closeAft3Wardrobe() {
+            suitclearedmenu.style.visibility = "hidden";
+        }
+
+        function closeAft4Wardrobe() {
+            suitunwornmenu.style.visibility = "hidden";
+        }
+
         function loadSuit() {
-            alert("Not done yet!");
+            var suit = getCookie(document.getElementById("wrsname").value);
+            if (suit != '') {
+                setCookie("loadedsuit", document.getElementById("wrsname").value, 365);
+                var ssuit = suit.split(",");
+                document.getElementById("suitchoose").style.visibility = "hidden";
+
+                climg = ssuit[0]; nsclose = ssuit[0];
+                opimg = ssuit[1]; nsopen = ssuit[1];
+                oplimg = ssuit[2]; nsopenloud = ssuit[2];
+
+                jcimg = ssuit[3]; nsjc = ssuit[3];
+                joimg = ssuit[4]; nsjo = ssuit[4];
+
+                suitloadedmenu.style.visibility = "visible";
+            } else {
+                alert("There is no saved suit with such name!");
+            }
         }
 
         function saveSuit() {
-            alert("Not done yet!");
+            if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('jarvisc') && urlParams.get('jarviso')) {
+                setCookie(document.getElementById("wrsname").value, urlParams.get('close') + "," + urlParams.get('open') + "," + urlParams.get('openloud') + "," + urlParams.get('jarvisc') + "," + urlParams.get('jarviso'), 365);
+                setCookie("loadedsuit", document.getElementById("wrsname").value, 365);
+                document.getElementById("suitchoose").style.visibility = "hidden";
+                suitokmenu.style.visibility = "visible";
+            } else {
+                alert("You must wear a custom suit in order to save!");
+            }
+        }
+
+        function unwearSuit() {
+            setCookie("loadedsuit", '', 365)
+
+            if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('jarvisc') && urlParams.get('jarviso')) {
+                opimg = urlParams.get("open");
+                climg = urlParams.get("close");
+                oplimg = urlParams.get("openloud");
+                joimg = urlParams.get("jarviso");
+                jcimg = urlParams.get("jarvisc");
+
+                nsopen = "open.png";
+                nsclose = "close.png";
+                nsopenloud = "openloud.png";
+
+                nsjc = "jarvisc.png";
+                nsjo = "jarviso.png";
+            } else {
+                opimg = "open.png";
+                climg = "close.png";
+                oplimg = "openloud.png";
+                joimg = "jarviso.png";
+                jcimg = "jarvisc.png";
+                
+                nsopen = "open.png";
+                nsclose = "close.png";
+                nsopenloud = "openloud.png";
+
+                nsjc = "jarvisc.png";
+                nsjo = "jarviso.png";
+            }
+
+            document.getElementById("suitchoose").style.visibility = "hidden";
+            suitunwornmenu.style.visibility = "visible";
+        }
+
+        function clearSuit() {
+            setCookie("loadedsuit", '', 365);
+
+            var suit = getCookie(document.getElementById("wrsname").value);
+            if (suit != '') {
+            setCookie(document.getElementById("wrsname").value, '', 365)
+
+            if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('jarvisc') && urlParams.get('jarviso')) {
+                opimg = urlParams.get("open");
+                climg = urlParams.get("close");
+                oplimg = urlParams.get("openloud");
+                joimg = urlParams.get("jarviso");
+                jcimg = urlParams.get("jarvisc");
+
+                nsopen = "open.png";
+                nsclose = "close.png";
+                nsopenloud = "openloud.png";
+
+                nsjc = "jarvisc.png";
+                nsjo = "jarviso.png";
+            } else {
+                opimg = "open.png";
+                climg = "close.png";
+                oplimg = "openloud.png";
+                joimg = "jarviso.png";
+                jcimg = "jarvisc.png";
+                
+                nsopen = "open.png";
+                nsclose = "close.png";
+                nsopenloud = "openloud.png";
+
+                nsjc = "jarvisc.png";
+                nsjo = "jarviso.png";
+            }
+
+            document.getElementById("suitchoose").style.visibility = "hidden";
+            suitclearedmenu.style.visibility = "visible";
+            } else {
+                alert("There is no saved suit with such name!");
+            }
         }
     </script>
 </body>
