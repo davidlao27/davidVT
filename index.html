@@ -317,9 +317,23 @@
             joimg = ssuit[4]; nsjo = ssuit[4];
         }
 
-        document.getElementById("chkjarvis").checked = urlParams.get("jmode");
-        document.getElementById("chksubs").checked = urlParams.get("subs");
-        document.getElementById("chkbobot").checked = urlParams.get("bob");
+        if (urlParams.get("bob") == "true") {
+            document.getElementById("chkbobot").checked = true;
+        } else {
+            document.getElementById("chkbobot").checked = false;
+        }
+
+        if (urlParams.get("jmode") == "true") {
+            document.getElementById("chkjarvis").checked = true;
+        } else {
+            document.getElementById("chkjarvis").checked = false;
+        }
+
+        if (urlParams.get("subs") == "true") {
+            document.getElementById("chksubs").checked = true;
+        } else {
+            document.getElementById("chksubs").checked = false;
+        }
 
         if (urlParams.get("lang") != null) document.getElementById("chklang").value = urlParams.get("lang")
         else document.getElementById("chklang").value = "en-EN";
