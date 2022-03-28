@@ -34,8 +34,8 @@
         }
 
         .btmnav {
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: medium;
+            font-family: sans-serif;
+            font-size: 14px;
             width: 45vw;
             height: 90vh;
             color: white;
@@ -216,7 +216,8 @@
         <br><br>
         <input type="checkbox" id="chkjarvis">Jarvis Mode<br>
         <input type="checkbox" id="chksubs">Subtitles<br>
-        <input type="checkbox" id="chkbobot">Bob-on-talk<br><br>
+        <input type="checkbox" id="chkbobot">Bob-on-talk<br>
+        <input type="checkbox" id="chklit">Light affection<br><br>
         Language<br>
         <textarea class="btmnavtx" placeholder="en-EN, es-ES..." id="chklang"></textarea><br><br>
 
@@ -235,7 +236,7 @@
         <textarea class="btmnavtx" placeholder="BG Image (url)" id="chkbki"></textarea><br>
         <br>
 
-        <div class="genbtn" onclick="hideMenu();">Exit</div>
+        <div class="genbtn" onclick="hideMenu();">Close</div>
         <div class="genbtn" onclick="applySettingsMenu();">Apply</div>
         <div class="genbtn" onclick="openMenuWardrobe();">Wardrobe</div>
     </div>
@@ -247,17 +248,64 @@
         const urlParams = new URLSearchParams(queryString);
 
         var jarvismode = false; var jarviscomm = false; let vol;
+        var canVaryLight = false;
         let canJarvis = false;
         let canBob = false;
         var nvol = 11; var lvol = 70;
+
+        function getImageLightness(imageSrc, callback) {
+            var img = document.createElement("img");
+            img.src = imageSrc;
+            img.crossOrigin = "Anonymous";
+            img.style.display = "none";
+            document.body.appendChild(img);
+
+            var colorSum = 0;
+
+            img.onload = function () {
+                // create canvas
+                var canvas = document.createElement("canvas");
+                canvas.width = this.width;
+                canvas.height = this.height;
+
+                var ctx = canvas.getContext("2d");
+                ctx.drawImage(this, 0, 0);
+
+                var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                var data = imageData.data;
+                var r, g, b, avg;
+
+                for (var x = 0, len = data.length; x < len; x += 4) {
+                    r = data[x];
+                    g = data[x + 1];
+                    b = data[x + 2];
+
+                    avg = Math.floor((r + g + b) / 3);
+                    colorSum += avg;
+                }
+
+                var brightness = Math.floor(colorSum / (this.width * this.height));
+                callback(brightness);
+            }
+        }
 
         if (urlParams.get("jmode") == "true") { canJarvis = true; }
         if (urlParams.get("subs") == "true") { document.getElementById("output").style.display = "initial"; }
         if (urlParams.get("nvol") != null) { nvol = urlParams.get("nvol"); }
         if (urlParams.get("lvol") != null) { lvol = urlParams.get("lvol"); }
         if (urlParams.get("bkcol") != null) { document.body.style.backgroundColor = "#" + urlParams.get("bkcol"); } else { document.body.style.backgroundColor = "#0F0"; }
-        if (urlParams.get("bkimg") != null) { document.body.style.backgroundImage = "url('" + urlParams.get("bkimg") + "')"; }
         if (urlParams.get("bob") != null) { if (urlParams.get("bob") == "true") { canBob = true; } }
+        if (urlParams.get("light") != null) { if (urlParams.get("light") == "true") { canVaryLight = true; } }
+
+        if (urlParams.get("bkimg") != null) {
+            document.body.style.backgroundImage = "url('" + urlParams.get("bkimg") + "')";
+            
+            if (canVaryLight) {
+                getImageLightness(urlParams.get("bkimg"), function(brightness){
+                document.getElementById("vtpic").style = "filter: brightness(" + (brightness/255) + ");";
+            });
+            }
+        }
 
         var nsopen = "open.png";
         var nsclose = "close.png";
@@ -321,6 +369,12 @@
             document.getElementById("chkbobot").checked = true;
         } else {
             document.getElementById("chkbobot").checked = false;
+        }
+
+        if (urlParams.get("light") == "true") {
+            document.getElementById("chklit").checked = true;
+        } else {
+            document.getElementById("chklit").checked = false;
         }
 
         if (urlParams.get("jmode") == "true") {
@@ -639,7 +693,7 @@
                 oplimg = "openloud.png";
                 joimg = "jarviso.png";
                 jcimg = "jarvisc.png";
-                
+
                 nsopen = "open.png";
                 nsclose = "close.png";
                 nsopenloud = "openloud.png";
@@ -657,38 +711,38 @@
 
             var suit = getCookie(document.getElementById("wrsname").value);
             if (suit != '') {
-            setCookie(document.getElementById("wrsname").value, '', 365)
+                setCookie(document.getElementById("wrsname").value, '', 365)
 
-            if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('jarvisc') && urlParams.get('jarviso')) {
-                opimg = urlParams.get("open");
-                climg = urlParams.get("close");
-                oplimg = urlParams.get("openloud");
-                joimg = urlParams.get("jarviso");
-                jcimg = urlParams.get("jarvisc");
+                if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('jarvisc') && urlParams.get('jarviso')) {
+                    opimg = urlParams.get("open");
+                    climg = urlParams.get("close");
+                    oplimg = urlParams.get("openloud");
+                    joimg = urlParams.get("jarviso");
+                    jcimg = urlParams.get("jarvisc");
 
-                nsopen = "open.png";
-                nsclose = "close.png";
-                nsopenloud = "openloud.png";
+                    nsopen = "open.png";
+                    nsclose = "close.png";
+                    nsopenloud = "openloud.png";
 
-                nsjc = "jarvisc.png";
-                nsjo = "jarviso.png";
-            } else {
-                opimg = "open.png";
-                climg = "close.png";
-                oplimg = "openloud.png";
-                joimg = "jarviso.png";
-                jcimg = "jarvisc.png";
-                
-                nsopen = "open.png";
-                nsclose = "close.png";
-                nsopenloud = "openloud.png";
+                    nsjc = "jarvisc.png";
+                    nsjo = "jarviso.png";
+                } else {
+                    opimg = "open.png";
+                    climg = "close.png";
+                    oplimg = "openloud.png";
+                    joimg = "jarviso.png";
+                    jcimg = "jarvisc.png";
 
-                nsjc = "jarvisc.png";
-                nsjo = "jarviso.png";
-            }
+                    nsopen = "open.png";
+                    nsclose = "close.png";
+                    nsopenloud = "openloud.png";
 
-            document.getElementById("suitchoose").style.visibility = "hidden";
-            suitclearedmenu.style.visibility = "visible";
+                    nsjc = "jarvisc.png";
+                    nsjo = "jarviso.png";
+                }
+
+                document.getElementById("suitchoose").style.visibility = "hidden";
+                suitclearedmenu.style.visibility = "visible";
             } else {
                 alert("There is no saved suit with such name!");
             }
