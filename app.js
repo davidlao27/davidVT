@@ -5,7 +5,8 @@ var jarvismode = false; var jarviscomm = false; let vol;
 var canVaryLight = false;
 let canJarvis = false;
 let canBob = false;
-var nvol = 7; var lvol = 80;
+var nvol = 3; var lvol = 80;
+var micwait_ms = 32;
 
 function getImageLightness(imageSrc, callback) {
     var img = document.createElement("img");
@@ -48,7 +49,7 @@ if (urlParams.get("subs") == "true") { document.getElementById("output").style.d
 if (urlParams.get("nvol") != null) { nvol = urlParams.get("nvol"); }
 if (urlParams.get("lvol") != null) { lvol = urlParams.get("lvol"); }
 if (urlParams.get("bkcol") != null) { document.body.style.backgroundColor = "#" + urlParams.get("bkcol"); } else { document.body.style.backgroundColor = "#0F0"; }
-if (urlParams.get("bob") != null) { if (urlParams.get("bob") == "true") { canBob = true; } }
+if (urlParams.get("bob") != null) { if (urlParams.get("bob") == "true") { canBob = true; micwait_ms = 50; } }
 if (urlParams.get("light") != null) { if (urlParams.get("light") == "true") { canVaryLight = true; } }
 
 if (urlParams.get("bkimg") != null) {
@@ -199,21 +200,20 @@ setInterval(() => {
 
     if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('jarvisc') && urlParams.get('jarviso')) {
         if (vol > 0 && vol < nvol) {
-            if (canBob) { vtpic.style.top = "50%"; vtpic.style.height = "100%"; }
+            if (canBob) { unbob(); }
             if (jarvismode) {
                 if (vtpic.src != jcimg) vtpic.src = jcimg;
             } else {
                 if (vtpic.src != climg) vtpic.src = climg;
             }
         } else if (vol > nvol && vol < lvol) {
-            if (canBob) { vtpic.style.top = "49.5%";}
+            if (canBob) { bob(); }
             if (jarvismode) {
                 if (vtpic.src != joimg) vtpic.src = joimg;
             } else {
                 if (vtpic.src != joimg) vtpic.src = opimg;
             }
         } else if (vol > lvol) {
-            if (canBob) { vtpic.style.top = "49.5%";}
             if (jarvismode) {
                 if (vtpic.src != joimg) vtpic.src = joimg;
             } else {
@@ -221,22 +221,21 @@ setInterval(() => {
             }
         }
     } else {
-        if (vol > 0 && vol < nvol) {
-            if (canBob) { vtpic.style.top = "50%"; }
+        if (vol < nvol) {
+            if (canBob) { unbob(); }
             if (jarvismode) {
                 if (vtpic.src != jcimg) vtpic.src = jcimg;
             } else {
                 if (vtpic.src != nsclose) vtpic.src = nsclose;
             }
         } else if (vol > nvol && vol < lvol) {
-            if (canBob) { vtpic.style.top = "49.5%"; }
+            if (canBob) { bob(); }
             if (jarvismode) {
                 if (vtpic.src != joimg) vtpic.src = joimg;
             } else {
                 if (vtpic.src != nsopen) vtpic.src = nsopen;
             }
         } else if (vol > lvol) {
-            if (canBob) { vtpic.style.top = "49.5%"; }
             if (jarvismode) {
                 if (vtpic.src != joimg) vtpic.src = joimg;
             } else {
@@ -244,7 +243,7 @@ setInterval(() => {
             }
         }
     }
-}, 32);
+}, micwait_ms);
 
 var recognition = new webkitSpeechRecognition();
 recognition.continuous = true;
@@ -492,6 +491,52 @@ function clearSuit() {
     } else {
         alert("There is no saved suit with such name!");
     }
+}
+
+var bobtween = 0;
+var unbobtween = 0;
+var unbobbed = true;
+
+async function bob() {
+    unbobbed = false;
+
+    if (unbobtween != 0)
+        unbobtween.stop();
+    
+    var holder = {top: 49.5};
+
+    bobtween = new TWEEN.Tween(holder) 
+	.to({top: 49}, 300)
+	.easing(TWEEN.Easing.Quadratic.Out)
+	.onUpdate(() => {
+		vtpic.style.setProperty('top', `${holder.top}%`)
+	})
+	.start()
+}
+
+async function unbob() {
+    if (!unbobbed) {
+        if (bobtween != 0)
+        bobtween.stop();
+    
+        var holder = {top: 49};
+
+        unbobtween = new TWEEN.Tween(holder)
+	        .to({top: 50}, 300)
+	        .easing(TWEEN.Easing.Quadratic.Out)
+	        .onUpdate(() => {
+		        vtpic.style.setProperty('top', `${holder.top}%`)
+	        })
+	        .start()
+
+        unbobbed = true;
+    }
+}
+
+if (canBob) {
+    setInterval(() => {
+        TWEEN.update(performance.now());
+    }, 16);
 }
 
 document.addEventListener('keydown', logKey);
