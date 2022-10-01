@@ -48,6 +48,8 @@
 }
 
 .vtimg {
+    /* filter: brightness(60%); */
+    
     /* Full height */
     position: absolute;
     height: 100%;

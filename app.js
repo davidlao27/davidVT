@@ -7,6 +7,9 @@ let canJarvis = false;
 let canBob = false;
 var nvol = 3; var lvol = 80;
 var micwait_ms = 32;
+var darkened = false;
+var toggledMenubar = false;
+var toggledMenu = false;
 
 function getImageLightness(imageSrc, callback) {
     var img = document.createElement("img");
@@ -47,6 +50,7 @@ function getImageLightness(imageSrc, callback) {
 if (urlParams.get("jmode") == "true") { canJarvis = true; }
 if (urlParams.get("subs") == "true") { document.getElementById("output").style.display = "initial"; }
 if (urlParams.get("nvol") != null) { nvol = urlParams.get("nvol"); }
+if (urlParams.get("talklit") != null) { darkened = urlParams.get("talklit"); }
 if (urlParams.get("lvol") != null) { lvol = urlParams.get("lvol"); }
 if (urlParams.get("bkcol") != null) { document.body.style.backgroundColor = "#" + urlParams.get("bkcol"); } else { document.body.style.backgroundColor = "#0F0"; }
 if (urlParams.get("bob") != null) { if (urlParams.get("bob") == "true") { canBob = true; micwait_ms = 50; } }
@@ -63,6 +67,7 @@ if (urlParams.get("bkimg") != null) {
 }
 
 var nsopen = "open.png";
+var nsopenalt = "open_alt.png";
 var nsclose = "close.png";
 var nsopenloud = "openloud.png";
 
@@ -105,6 +110,7 @@ function getCookie(cname) {
 //Cookies//
 
 var opimg = urlParams.get("open");
+var opaltimg = urlParams.get("openalt");
 var climg = urlParams.get("close");
 var oplimg = urlParams.get("openloud");
 
@@ -144,6 +150,12 @@ if (urlParams.get("subs") == "true") {
     document.getElementById("chksubs").checked = false;
 }
 
+if (urlParams.get("talklit") == "true") {
+    document.getElementById("chkDWS").checked = true;
+} else {
+    document.getElementById("chkDWS").checked = false;
+}
+
 if (urlParams.get("lang") != null) document.getElementById("chklang").value = urlParams.get("lang")
 else document.getElementById("chklang").value = "en-EN";
 
@@ -156,6 +168,9 @@ else document.getElementById("chkvoll").value = "70";
 
 if (urlParams.get("open") != null) document.getElementById("chkopen").value = urlParams.get("open")
 else document.getElementById("chkopen").value = "open.png";
+
+if (urlParams.get("openalt") != null) document.getElementById("chkopenalt").value = urlParams.get("openalt")
+else document.getElementById("chkopenalt").value = "open_alt.png";
 
 if (urlParams.get("close") != null) document.getElementById("chkclose").value = urlParams.get("close")
 else document.getElementById("chkclose").value = "close.png";
@@ -195,12 +210,22 @@ window.addEventListener("click", async function(event) {
     audioContext.resume();
 });
 
+if (darkened) {
+    vtpic.style.filter = "brightness(60%)";
+}
+
+
+var chanced = false;
+
 setInterval(() => {
     volstr.innerHTML = vol;
 
     if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('jarvisc') && urlParams.get('jarviso')) {
         if (vol > 0 && vol < nvol) {
+            chanced = false;
             if (canBob) { unbob(); }
+            if (darkened) { undarken(); }
+
             if (jarvismode) {
                 if (vtpic.src != jcimg) vtpic.src = jcimg;
             } else {
@@ -208,10 +233,26 @@ setInterval(() => {
             }
         } else if (vol > nvol && vol < lvol) {
             if (canBob) { bob(); }
+            if (darkened) { darken(); }
+
             if (jarvismode) {
                 if (vtpic.src != joimg) vtpic.src = joimg;
             } else {
-                if (vtpic.src != joimg) vtpic.src = opimg;
+                if (vtpic.src != joimg && !chanced) {
+                    if (urlParams.get('openalt') != null) {
+                        var chance = Math.random();
+
+                        if (chance > 0.3) {
+                            vtpic.src = opimg;
+                        } else {
+                            vtpic.src = opaltimg;
+                        }
+                    } else {
+                        vtpic.src = opimg;
+                    }
+
+                    chanced = true;
+                }
             }
         } else if (vol > lvol) {
             if (jarvismode) {
@@ -223,6 +264,7 @@ setInterval(() => {
     } else {
         if (vol < nvol) {
             if (canBob) { unbob(); }
+            if (darkened) { undarken(); }
             if (jarvismode) {
                 if (vtpic.src != jcimg) vtpic.src = jcimg;
             } else {
@@ -230,6 +272,7 @@ setInterval(() => {
             }
         } else if (vol > nvol && vol < lvol) {
             if (canBob) { bob(); }
+            if (darkened) { darken(); }
             if (jarvismode) {
                 if (vtpic.src != joimg) vtpic.src = joimg;
             } else {
@@ -333,6 +376,7 @@ const nvolchk = document.getElementById("chkvoln");
 const lvolchk = document.getElementById("chkvoll");
 
 const chkopen = document.getElementById("chkopen");
+const chkopenalt = document.getElementById("chkopenalt");
 const chkclose = document.getElementById("chkclose");
 const chkol = document.getElementById("chkol");
 
@@ -344,16 +388,22 @@ const chklitty = document.getElementById("chklit");
 const bkcolchk = document.getElementById("chkbkc");
 const bkimgchk = document.getElementById("chkbki");
 
+const chkDWS = document.getElementById("chkDWS");
+
 function openMenu() {
     cmenu.style.visibility = "visible";
+    toggledMenu = true
 }
 
 function hideMenu() {
     cmenu.style.visibility = "hidden";
+    toggledMenu = false
 }
 
 function applySettingsMenu() {
-    window.location.replace("https://davidlao27.github.io/davidVT?close=" + chkclose.value + "&open=" + chkopen.value + "&openloud=" + chkol.value + "&jarvisc=" + chkjc.value + "&jarviso=" + chkjo.value + "&jmode=" + jarvischk.checked + "&nvol=" + nvolchk.value + "&lvol=" + lvolchk.value + "&subs=" + subsschk.checked + "&bkcol=" + bkcolchk.value + "&bkimg=" + bkimgchk.value + "&bob=" + bobotchk.checked + "&lang=" + langchk.value + "&light=" + chklitty.checked);
+    if (chkopenalt.value == "") { chkopenalt.value = "open.png" }
+
+    window.location.replace("https://davidlao27.github.io/davidVT?close=" + chkclose.value + "&open=" + chkopen.value + "&openalt=" + chkopenalt.value + "&openloud=" + chkol.value + "&jarvisc=" + chkjc.value + "&jarviso=" + chkjo.value + "&jmode=" + jarvischk.checked + "&nvol=" + nvolchk.value + "&lvol=" + lvolchk.value + "&subs=" + subsschk.checked + "&bkcol=" + bkcolchk.value + "&bkimg=" + bkimgchk.value + "&bob=" + bobotchk.checked + "&lang=" + langchk.value + "&light=" + chklitty.checked + "&talklit=" + chkDWS.checked);
 }
 
 function openWardrobe() {
@@ -421,6 +471,7 @@ function unwearSuit() {
 
     if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('jarvisc') && urlParams.get('jarviso')) {
         opimg = urlParams.get("open");
+        opaltimg = urlParams.get("openalt");
         climg = urlParams.get("close");
         oplimg = urlParams.get("openloud");
         joimg = urlParams.get("jarviso");
@@ -458,14 +509,18 @@ function clearSuit() {
     if (suit != '') {
         setCookie(document.getElementById("wrsname").value, '', 365)
 
+        if (urlParams.get('open'))
+
         if (urlParams.get('close') && urlParams.get('open') && urlParams.get('openloud') && urlParams.get('jarvisc') && urlParams.get('jarviso')) {
             opimg = urlParams.get("open");
+            opaltimg = urlParams.get("openalt");
             climg = urlParams.get("close");
             oplimg = urlParams.get("openloud");
             joimg = urlParams.get("jarviso");
             jcimg = urlParams.get("jarvisc");
 
             nsopen = "open.png";
+            nsopenalt = "open_alt.png";
             nsclose = "close.png";
             nsopenloud = "openloud.png";
 
@@ -473,12 +528,14 @@ function clearSuit() {
             nsjo = "jarviso.png";
         } else {
             opimg = "open.png";
+            opaltimg = "open_alt.png";
             climg = "close.png";
             oplimg = "openloud.png";
             joimg = "jarviso.png";
             jcimg = "jarvisc.png";
 
             nsopen = "open.png";
+            nsopenalt = "open_alt.png";
             nsclose = "close.png";
             nsopenloud = "openloud.png";
 
@@ -498,7 +555,7 @@ var unbobtween = 0;
 var unbobbed = true;
 
 async function bob() {
-    unbobbed = false;
+    if (unbobbed) {
 
     if (unbobtween != 0)
         unbobtween.stop();
@@ -512,6 +569,8 @@ async function bob() {
 		vtpic.style.setProperty('top', `${holder.top}%`)
 	})
 	.start()
+    unbobbed = false;
+    }
 }
 
 async function unbob() {
@@ -533,7 +592,47 @@ async function unbob() {
     }
 }
 
-if (canBob) {
+var darktween = 0;
+var undarktween = 0;
+var undarkk = true;
+
+async function darken() {
+    if (undarkk) {
+        if (undarktween != 0)
+        undarktween.stop();
+
+    var holder = {filter: 60};
+    undarktween = new TWEEN.Tween(holder) 
+	.to({filter: 100}, 100)
+	.easing(TWEEN.Easing.Quadratic.Out)
+	.onUpdate(() => {
+		vtpic.style.filter = `brightness(${holder.filter}%)`;
+	})
+	.start()
+
+    undarkk = false;
+    }
+}
+
+async function undarken() {
+    if (!undarkk) {
+        if (darktween != 0) { darktween.stop(); }
+
+    var holder = {filter: 100};
+
+    darktween = new TWEEN.Tween(holder) 
+	.to({filter: 60}, 100)
+	.easing(TWEEN.Easing.Quadratic.Out)
+	.onUpdate(() => {
+		vtpic.style.filter = `brightness(${holder.filter}%)`;
+	})
+	.start()
+    
+    undarkk = true;
+    }
+}
+
+if (canBob || darkened) {
     setInterval(() => {
         TWEEN.update(performance.now());
     }, 16);
@@ -543,11 +642,23 @@ document.addEventListener('keydown', logKey);
 
 async function logKey(e) {
     if (e.code == "KeyZ") {
-        document.getElementById("btmnav").style.visibility = "visible";
+        if (!toggledMenu) {
+            document.getElementById("btmnav").style.visibility = "visible";
+            toggledMenu = true
+        } else {
+            document.getElementById("btmnav").style.visibility = "hidden";
+            toggledMenu = false
+        }
     }
 
     if (e.code == "KeyX") {
-        openMenubar("menubar_background")
+        if (!toggledMenubar) {
+            openMenubar("menubar_background")
+            toggledMenubar = true;
+        } else {
+            closeMenubar("menubar_background")
+            toggledMenubar = false;
+        }
     }
 }
 
@@ -557,6 +668,7 @@ function setbkc(col) {
 
 function closeMenubar(menuName) {
     document.getElementById(menuName).style.display = "none";
+    toggledMenubar = false
 }
 
 function openMenubar(barname) {
