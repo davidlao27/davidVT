@@ -50,7 +50,7 @@ function getImageLightness(imageSrc, callback) {
 if (urlParams.get("jmode") == "true") { canJarvis = true; }
 if (urlParams.get("subs") == "true") { document.getElementById("output").style.display = "initial"; }
 if (urlParams.get("nvol") != null) { nvol = urlParams.get("nvol"); }
-if (urlParams.get("talklit") != null) { darkened = urlParams.get("talklit"); }
+if (urlParams.get("talklit") != null && urlParams.get("talklit") == "true") { darkened = true }
 if (urlParams.get("lvol") != null) { lvol = urlParams.get("lvol"); }
 if (urlParams.get("bkcol") != null) { document.body.style.backgroundColor = "#" + urlParams.get("bkcol"); } else { document.body.style.backgroundColor = "#0F0"; }
 if (urlParams.get("bob") != null) { if (urlParams.get("bob") == "true") { canBob = true; micwait_ms = 50; } }
