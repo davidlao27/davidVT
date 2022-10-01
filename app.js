@@ -159,10 +159,10 @@ if (urlParams.get("talklit") == "true") {
 if (urlParams.get("lang") != null) document.getElementById("chklang").value = urlParams.get("lang")
 else document.getElementById("chklang").value = "en-EN";
 
-if (urlParams.get("nvol") != null) document.getElementById("chkvoll").value = urlParams.get("nvol")
+if (urlParams.get("nvol") != null) document.getElementById("chkvoln").value = urlParams.get("nvol")
 else document.getElementById("chkvoln").value = "7";
 
-if (urlParams.get("lvol") != null) document.getElementById("chkvoln").value = urlParams.get("lvol")
+if (urlParams.get("lvol") != null) document.getElementById("chkvoll").value = urlParams.get("lvol")
 else document.getElementById("chkvoll").value = "70";
 
 
